@@ -1127,9 +1127,18 @@ public abstract class AbstractByteBuf extends ByteBuf {
         return writtenBytes;
     }
 
+    /**
+     *
+     * @param in
+     * @param length the maximum number of bytes to transfer
+     *
+     * @return
+     * @throws IOException 代表读数据时被关闭
+     */
     @Override
     public int writeBytes(ScatteringByteChannel in, int length) throws IOException {
         ensureWritable(length);
+        // -1 代表EOR，正常关闭
         int writtenBytes = setBytes(writerIndex, in, length);
         if (writtenBytes > 0) {
             writerIndex += writtenBytes;

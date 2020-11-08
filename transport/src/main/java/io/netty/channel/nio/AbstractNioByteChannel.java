@@ -97,7 +97,9 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
     protected class NioByteUnsafe extends AbstractNioUnsafe {
 
         private void closeOnRead(ChannelPipeline pipeline) {
+            // input 关闭了吗？ 没有
             if (!isInputShutdown0()) {
+                // 判断是否支持半关，如果是，关闭读，触发事件
                 if (isAllowHalfClosure(config())) {
                     shutdownInput();
                     pipeline.fireUserEventTriggered(ChannelInputShutdownEvent.INSTANCE);
@@ -160,14 +162,18 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
 
                     allocHandle.incMessagesRead(1);
                     readPending = false;
+                    // 业务逻辑的处理，其实就是在pipeline上的传播
                     pipeline.fireChannelRead(byteBuf);
                     byteBuf = null;
                 } while (allocHandle.continueReading());
 
+                // 记录这次读事件总共读了多少数据
                 allocHandle.readComplete();
+                // 相当于完成本次读事件的处理
                 pipeline.fireChannelReadComplete();
 
                 if (close) {
+                    // 执行关闭操作
                     closeOnRead(pipeline);
                 }
             } catch (Throwable t) {

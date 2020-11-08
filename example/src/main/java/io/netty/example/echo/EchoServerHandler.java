@@ -25,8 +25,13 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 @Sharable
 public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
+    public EchoServerHandler() {
+        System.out.println("EchoServerHandler constructor invoked");
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        System.out.println("EchoServerHandler channelRead invoked");
         ctx.write(msg);
     }
 

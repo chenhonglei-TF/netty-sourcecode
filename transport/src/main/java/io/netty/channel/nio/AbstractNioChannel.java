@@ -408,9 +408,11 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         }
 
         readPending = true;
-
+        // 假设之前没有监听readInterestOp 则监听readInterestOp
         final int interestOps = selectionKey.interestOps();
         if ((interestOps & readInterestOp) == 0) {
+            // 真正的注册OP_ACCEPT
+            logger.info("interestOps: " + readInterestOp);
             selectionKey.interestOps(interestOps | readInterestOp);
         }
     }

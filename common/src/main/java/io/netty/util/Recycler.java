@@ -168,10 +168,12 @@ public abstract class Recycler<T> {
     @SuppressWarnings("unchecked")
     public final T get() {
         if (maxCapacityPerThread == 0) {
+            // 表示没有开启池化
             return newObject((Handle<T>) NOOP_HANDLE);
         }
         Stack<T> stack = threadLocal.get();
         DefaultHandle<T> handle = stack.pop();
+        // 试图从池中取出一个，没有就新建一个
         if (handle == null) {
             handle = stack.newHandle();
             handle.value = newObject(handle);
