@@ -69,6 +69,10 @@ import java.util.Arrays;
  * between the original data and the copied buffer.  Various copy methods are
  * provided and their name is all {@code copiedBuffer()}.  It is also convenient
  * to use this operation to merge multiple buffers into one buffer.
+ *
+ * Unpooled.wrappedBuffer 方法可以将不同的数据源的一个或者多个数据包装成一个大的 ByteBuf 对象，
+ * 其中数据源的类型包括 byte[]、ByteBuf、ByteBuffer。
+ * 包装的过程中不会发生数据拷贝操作，包装后生成的 ByteBuf 对象和原始 ByteBuf 对象是共享底层的 byte 数组
  */
 public final class Unpooled {
 

@@ -169,6 +169,7 @@ final class PoolThreadCache {
             // no cache found so just return false here
             return false;
         }
+        // 默认每执行 8192 次 allocate()，就会调用一次 trim() 进行内存整理
         boolean allocated = cache.allocate(buf, reqCapacity, this);
         if (++ allocations >= freeSweepAllocationThreshold) {
             allocations = 0;

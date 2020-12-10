@@ -244,6 +244,11 @@ import java.nio.charset.UnsupportedCharsetException;
  *
  * Please refer to {@link ByteBufInputStream} and
  * {@link ByteBufOutputStream}.
+ * 1.容量可以按需动态扩容，类似StringBuffer
+ * 2.读写采用了不同的指针，读写模式可以随意切换，不需要调用flip方法
+ * 3.通过内置的复合缓冲类型可以实现零拷贝
+ * 4.支持引用计数
+ * 5.支持缓存池
  */
 public abstract class ByteBuf implements ReferenceCounted, Comparable<ByteBuf> {
 

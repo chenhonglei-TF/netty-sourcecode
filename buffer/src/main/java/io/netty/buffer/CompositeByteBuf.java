@@ -1869,13 +1869,17 @@ public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements
     }
 
     private static final class Component {
+        // 原始的 ByteBuf
         final ByteBuf srcBuf; // the originally added buffer
+        // srcBuf 去除包装之后的 ByteBuf
         final ByteBuf buf; // srcBuf unwrapped zero or more times
-
+        // CompositeByteBuf 的起始索引相对于 srcBuf 读索引的偏移
         int srcAdjustment; // index of the start of this CompositeByteBuf relative to srcBuf
+        // CompositeByteBuf 的起始索引相对于 buf 的读索引的偏移
         int adjustment; // index of the start of this CompositeByteBuf relative to buf
-
+        // Component 相对于 CompositeByteBuf 的起始索引位置
         int offset; // offset of this component within this CompositeByteBuf
+        // Component 相对于 CompositeByteBuf 的结束索引位置
         int endOffset; // end offset of this component within this CompositeByteBuf
 
         private ByteBuf slice; // cached slice, may be null

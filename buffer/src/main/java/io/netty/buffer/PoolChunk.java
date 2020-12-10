@@ -131,6 +131,9 @@ import java.util.PriorityQueue;
  * 3) merge continuous avail runs
  * 4) save the merged run
  *
+ *
+ * PoolChunk:Netty 内存的分配和回收都是基于 PoolChunk 完成的，PoolChunk 是真正存储内存数据的地方，每个 PoolChunk 的默认大小为 16M
+ *
  */
 final class PoolChunk<T> implements PoolChunkMetric {
 
@@ -146,7 +149,7 @@ final class PoolChunk<T> implements PoolChunkMetric {
     static final int RUN_OFFSET_SHIFT = SIZE_BIT_LENGTH + SIZE_SHIFT;
 
     final PoolArena<T> arena;
-    final T memory;
+    final T memory;// 存储的数据
     final boolean unpooled;
     final int offset;
 
@@ -162,6 +165,7 @@ final class PoolChunk<T> implements PoolChunkMetric {
 
     /**
      * manage all subpages in this chunk
+     *  PoolChunk 中管理的 2048 个 8K 内存块
      */
     private final PoolSubpage<T>[] subpages;
 
@@ -176,7 +180,7 @@ final class PoolChunk<T> implements PoolChunkMetric {
     // This may be null if the PoolChunk is unpooled as pooling the ByteBuffer instances does not make any sense here.
     private final Deque<ByteBuffer> cachedNioBuffers;
 
-    int freeBytes;
+    int freeBytes;// 剩余的内存大小
 
     PoolChunkList<T> parent;
     PoolChunk<T> prev;

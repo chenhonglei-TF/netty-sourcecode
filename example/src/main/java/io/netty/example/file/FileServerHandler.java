@@ -25,6 +25,9 @@ import io.netty.handler.stream.ChunkedFile;
 
 import java.io.RandomAccessFile;
 
+/**
+ * Netty 使用 FileRegion 实现文件传输的零拷贝。FileRegion 的默认实现类是 DefaultFileRegion，通过 DefaultFileRegion 将文件内容写入到 NioSocketChannel
+ */
 public class FileServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override

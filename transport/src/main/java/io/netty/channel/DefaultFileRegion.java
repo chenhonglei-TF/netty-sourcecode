@@ -38,11 +38,11 @@ import static io.netty.util.internal.ObjectUtil.checkPositiveOrZero;
 public class DefaultFileRegion extends AbstractReferenceCounted implements FileRegion {
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(DefaultFileRegion.class);
-    private final File f;
-    private final long position;
-    private final long count;
-    private long transferred;
-    private FileChannel file;
+    private final File f;// 传输的文件
+    private final long position;// 文件的起始位置
+    private final long count;// 传输的字节数
+    private long transferred;// 已经写入的字节数
+    private FileChannel file;// 文件对应的 FileChannel
 
     /**
      * Create a new instance
