@@ -22,13 +22,14 @@ import java.util.concurrent.TimeUnit;
 /**
  * Schedules {@link TimerTask}s for one-time future execution in a background
  * thread.
+ * Timer 可以认为是上层的时间轮调度器，通过 newTimeout() 方法可以提交一个任务 TimerTask，并返回一个 Timeout
  */
 public interface Timer {
 
     /**
      * Schedules the specified {@link TimerTask} for one-time execution after
      * the specified delay.
-     *
+     * 创建任务
      * @return a handle which is associated with the specified task
      *
      * @throws IllegalStateException       if this timer has been {@linkplain #stop() stopped} already
@@ -40,7 +41,7 @@ public interface Timer {
     /**
      * Releases all resources acquired by this {@link Timer} and cancels all
      * tasks which were scheduled but not executed yet.
-     *
+     * 停止所有未执行任务.
      * @return the handles associated with the tasks which were canceled by
      *         this method
      */

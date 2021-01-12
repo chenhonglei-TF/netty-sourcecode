@@ -38,6 +38,8 @@ import java.util.Set;
  * {@link ThreadLocal}.
  * </p>
  *
+ * FastThreadLocal 是通过空间换时间的思想提升读写性能.
+ *
  * @param <V> the type of the thread-local variable
  * @see ThreadLocal
  */
@@ -188,8 +190,10 @@ public class FastThreadLocal<V> {
      * Set the value for the current thread.
      */
     public final void set(V value) {
-        if (value != InternalThreadLocalMap.UNSET) {
+        if (value != InternalThreadLocalMap.UNSET) {// 1. value 是否为缺省值
+            // 2. 获取当前线程的 InternalThreadLocalMap
             InternalThreadLocalMap threadLocalMap = InternalThreadLocalMap.get();
+            // 3. 将 InternalThreadLocalMap 中数据替换为新的 value
             setKnownNotUnset(threadLocalMap, value);
         } else {
             remove();
