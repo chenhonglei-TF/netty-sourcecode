@@ -247,8 +247,14 @@ import java.nio.charset.UnsupportedCharsetException;
  * 1.容量可以按需动态扩容，类似StringBuffer
  * 2.读写采用了不同的指针，读写模式可以随意切换，不需要调用flip方法
  * 3.通过内置的复合缓冲类型可以实现零拷贝
- * 4.支持引用计数
+ * 4.支持引用计数:ByteBuf 是基于引用计数设计的，它实现了 ReferenceCounted 接口，ByteBuf 的生命周期是由引用计数所管理。
+ * 只要引用计数大于 0，表示 ByteBuf 还在被使用；当 ByteBuf 不再被其他对象所引用时，引用计数为 0，那么代表该对象可以被释放.
+ * 当引用计数为 0，该 ByteBuf 可以被放入到对象池中，避免每次使用 ByteBuf 都重复创建，对于实现高性能的内存管理有着很大的意义。
  * 5.支持缓存池
+ *
+ *
+ * ByteBuf 分类:划分为三个不同的维度：Heap/Direct、Pooled/Unpooled和Unsafe/非 Unsafe
+ *
  */
 public abstract class ByteBuf implements ReferenceCounted, Comparable<ByteBuf> {
 

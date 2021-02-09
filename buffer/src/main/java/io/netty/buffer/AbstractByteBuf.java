@@ -68,10 +68,21 @@ public abstract class AbstractByteBuf extends ByteBuf {
     static final ResourceLeakDetector<ByteBuf> leakDetector =
             ResourceLeakDetectorFactory.instance().newResourceLeakDetector(ByteBuf.class);
 
+    //读指针
+    // 可读字节数：可以通过 writeIndex - readerIndex 计算得出。
+    // 从 ByteBuf 读取 N 个字节，readerIndex 就会自增 N，readerIndex 不会大于 writeIndex，
+    // 当 readerIndex == writeIndex 时，表示 ByteBuf 已经不可读
     int readerIndex;
+    //写指针
+    // 可写字节，向 ByteBuf 中写入数据都会存储到可写字节区域。
+    // 向 ByteBuf 写入 N 字节数据，writeIndex 就会自增 N，
+    // 当 writeIndex 超过 capacity，表示 ByteBuf 容量不足，需要扩容
     int writerIndex;
     private int markedReaderIndex;
     private int markedWriterIndex;
+    //最大容量
+    //可扩容字节，表示 ByteBuf 最多还可以扩容多少字节，当 writeIndex 超过 capacity 时，
+    // 会触发 ByteBuf 扩容，最多扩容到 maxCapacity 为止，超过 maxCapacity 再写入就会出错
     private int maxCapacity;
 
     protected AbstractByteBuf(int maxCapacity) {

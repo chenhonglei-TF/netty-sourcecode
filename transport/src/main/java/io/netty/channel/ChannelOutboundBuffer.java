@@ -50,6 +50,8 @@ import static java.lang.Math.min;
  * <li>{@link #getUserDefinedWritability(int)} and {@link #setUserDefinedWritability(int, boolean)}</li>
  * </ul>
  * </p>
+ *
+ * 是一个链表结构，每次传入的数据都会被封装成一个 Entry 对象添加到链表中
  */
 public final class ChannelOutboundBuffer {
     // Assuming a 64-bit JVM:
@@ -76,10 +78,13 @@ public final class ChannelOutboundBuffer {
     // Entry(flushedEntry) --> ... Entry(unflushedEntry) --> ... Entry(tailEntry)
     //
     // The Entry that is the first in the linked-list structure that was flushed
+    // 被写到缓冲区的节点
     private Entry flushedEntry;
     // The Entry which is the first unflushed in the linked-list structure
+    //未被写到缓冲区的节点
     private Entry unflushedEntry;
     // The Entry which represents the tail of the buffer
+    //最后一个节点
     private Entry tailEntry;
     // The number of flushed entries that are not written yet
     private int flushed;
@@ -149,6 +154,7 @@ public final class ChannelOutboundBuffer {
                 if (!entry.promise.setUncancellable()) {
                     // Was cancelled so make sure we free up memory and notify about the freed bytes
                     int pending = entry.cancel();
+                    // 减去待发送的数据，如果总字节数低于低水位，那么 Channel 将变为可写状态
                     decrementPendingOutboundBytes(pending, false, true);
                 }
                 entry = entry.next;
@@ -173,7 +179,8 @@ public final class ChannelOutboundBuffer {
         }
 
         long newWriteBufferSize = TOTAL_PENDING_SIZE_UPDATER.addAndGet(this, size);
-        // 判断待发送的数据的size是否高于高水位线
+        // 判断待发送的数据的size是否高于高水位线64KB,如果超过了高水位，那么 Channel 会被设置为不可写状态。
+        // 直到缓存的数据大小低于低水位线 32KB 以后，Channel 才恢复成可写状态
         if (newWriteBufferSize > channel.config().getWriteBufferHighWaterMark()) {
             setUnwritable(invokeLater);
         }

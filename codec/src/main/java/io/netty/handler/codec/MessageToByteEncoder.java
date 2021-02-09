@@ -102,17 +102,18 @@ public abstract class MessageToByteEncoder<I> extends ChannelOutboundHandlerAdap
             if (acceptOutboundMessage(msg)) {// 消息类型是否匹配
                 @SuppressWarnings("unchecked")
                 I cast = (I) msg;
-                // 分配ByteBuf资源
+                // 分配ByteBuf资源,默认使用堆外内存；
                 buf = allocateBuffer(ctx, cast, preferDirect);
                 try {
                     // 执行encode方法完成数据编码
                     encode(ctx, cast, buf);
                 } finally {
+                    //一旦消息被成功编码，会通过调用 ReferenceCountUtil.release(cast) 自动释放；
                     ReferenceCountUtil.release(cast);
                 }
 
                 if (buf.isReadable()) {
-                    // 写
+                    // 向后传递写事件
                     ctx.write(buf, promise);
                 } else {
                     buf.release();

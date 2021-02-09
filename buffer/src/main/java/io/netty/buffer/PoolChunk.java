@@ -428,6 +428,7 @@ final class PoolChunk<T> implements PoolChunkMetric {
     private long allocateSubpage(int sizeIdx) {
         // Obtain the head of the PoolSubPage pool that is owned by the PoolArena and synchronize on it.
         // This is need as we may add it back and so alter the linked-list structure.
+        // 根据内存大小找到 PoolArena 中 subpage 数组对应的头结点
         PoolSubpage<T> head = arena.findSubpagePoolHead(sizeIdx);
         synchronized (head) {
             //allocate a new run

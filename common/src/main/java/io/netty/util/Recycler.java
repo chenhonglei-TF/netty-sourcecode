@@ -35,6 +35,7 @@ import static java.lang.Math.min;
 /**
  * Light-weight object pool based on a thread-local stack.
  *
+ * Recycler 对象池
  * @param <T> the type of the pooled object
  */
 public abstract class Recycler<T> {
@@ -171,10 +172,13 @@ public abstract class Recycler<T> {
             // 表示没有开启池化
             return newObject((Handle<T>) NOOP_HANDLE);
         }
+        // 获取当前线程缓存的 Stack
         Stack<T> stack = threadLocal.get();
+        // 从 Stack 中弹出一个 DefaultHandle 对象
         DefaultHandle<T> handle = stack.pop();
         // 试图从池中取出一个，没有就新建一个
         if (handle == null) {
+            // 创建的对象并保存到 DefaultHandle
             handle = stack.newHandle();
             handle.value = newObject(handle);
         }
@@ -507,7 +511,7 @@ public abstract class Recycler<T> {
         // than the stack owner recycles: when we run out of items in our stack we iterate this collection
         // to scavenge those that can be reused. this permits us to incur minimal thread synchronisation whilst
         // still recycling all items.
-        final Recycler<T> parent;
+        final Recycler<T> parent;// 所属的 Recycler
 
         // We store the Thread in a WeakReference as otherwise we may be the only ones that still hold a strong
         // Reference to the Thread itself after it died because DefaultHandle will hold a reference to the Stack.

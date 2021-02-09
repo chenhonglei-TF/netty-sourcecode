@@ -49,6 +49,9 @@ import java.nio.channels.WritableByteChannel;
  * performance.  For example, sending a large file doesn't work well in Windows.
  *
  * <h3>Not all transports support it</h3>
+ *
+ * Netty 使用 FileRegion 实现文件传输，FileRegion 底层封装了 FileChannel#transferTo() 方法，
+ * 可以将文件缓冲区的数据直接传输到目标 Channel，避免内核缓冲区和用户态缓冲区之间的数据拷贝，这属于操作系统级别的零拷贝
  */
 public interface FileRegion extends ReferenceCounted {
 

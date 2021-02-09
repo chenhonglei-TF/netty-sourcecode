@@ -60,9 +60,17 @@ import java.util.List;
  */
 public class DelimiterBasedFrameDecoder extends ByteToMessageDecoder {
 
+    //指定特殊分隔符，通过写入 ByteBuf 作为参数传入。delimiters 的类型是 ByteBuf 数组，所以我们可以同时指定多个分隔符，但是最终会选择长度最短的分隔符进行消息拆分
     private final ByteBuf[] delimiters;
+    //是报文最大长度的限制。如果超过 maxLength 还没有检测到指定分隔符，将会抛出 TooLongFrameException。可以说 maxLength 是对程序在极端情况下的一种保护措施。
     private final int maxFrameLength;
+
+    // stripDelimiter 的作用是判断解码后得到的消息是否去除分隔符。如果 stripDelimiter=false，特定分隔符为 \n
     private final boolean stripDelimiter;
+
+    //failFast 与 maxLength 需要搭配使用，通过设置 failFast 可以控制抛出 TooLongFrameException 的时机，可以说 Netty 在细节上考虑得面面俱到。
+    // 如果 failFast=true，那么在超出 maxLength 会立即抛出 TooLongFrameException，不再继续进行解码。
+    // 如果 failFast=false，那么会等到解码出一个完整的消息后才会抛出 TooLongFrameException。
     private final boolean failFast;
     private boolean discardingTooLongFrame;
     private int tooLongFrameLength;

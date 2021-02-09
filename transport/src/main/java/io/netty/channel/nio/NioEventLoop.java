@@ -350,6 +350,9 @@ public final class NioEventLoop extends SingleThreadEventLoop {
     /**
      * Replaces the current {@link Selector} of this event loop with newly created {@link Selector}s to work
      * around the infamous epoll 100% CPU bug.
+     *
+     * Netty 采用重建Selector这种方法巧妙地规避了 JDK Bug。
+     * 异常的 Selector 中所有的 SelectionKey 会重新注册到新建的 Selector 上，重建完成之后异常的 Selector 就可以废弃了。
      */
     public void rebuildSelector() {
         if (!inEventLoop()) {
@@ -433,7 +436,10 @@ public final class NioEventLoop extends SingleThreadEventLoop {
 
     @Override
     protected void run() {
+        // 在正常情况下，selectCnt 会重置，否则会对 selectCnt 自增计数。
+        // 当 selectCnt 达到 SELECTOR_AUTO_REBUILD_THRESHOLD（默认512） 阈值时，会触发重建 Selector 对象。
         int selectCnt = 0;
+
         for (;;) {
             try {
                 int strategy;
@@ -454,6 +460,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                         nextWakeupNanos.set(curDeadlineNanos);
                         try {
                             if (!hasTasks()) {
+                                // 轮询 I/O 事件
                                 strategy = select(curDeadlineNanos);
                             }
                         } finally {
@@ -481,10 +488,12 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 if (ioRatio == 100) {
                     try {
                         if (strategy > 0) {
+                            // 处理 I/O 事件
                             processSelectedKeys();
                         }
                     } finally {
                         // Ensure we always run tasks.
+                        // 处理所有任务
                         ranTasks = runAllTasks();
                     }
                 } else if (strategy > 0) {
@@ -494,6 +503,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                     } finally {
                         // Ensure we always run tasks.
                         final long ioTime = System.nanoTime() - ioStartTime;
+                        // 处理完 I/O 事件，再处理异步任务队列
                         ranTasks = runAllTasks(ioTime * (100 - ioRatio) / ioRatio);
                     }
                 } else {
@@ -552,6 +562,7 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             }
             return true;
         }
+        // 当 selectCnt 达到 SELECTOR_AUTO_REBUILD_THRESHOLD（默认512） 阈值时，会触发重建 Selector 对象
         if (SELECTOR_AUTO_REBUILD_THRESHOLD > 0 &&
                 selectCnt >= SELECTOR_AUTO_REBUILD_THRESHOLD) {
             // The selector returned prematurely many times in a row.

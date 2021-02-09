@@ -42,14 +42,16 @@ abstract class PoolArena<T> extends SizeClasses implements PoolArenaMetric {
     final int numSmallSubpagePools;
     final int directMemoryCacheAlignment;
     final int directMemoryCacheAlignmentMask;
+    // PoolSubpage 用于分配小于 8K 的内存
     private final PoolSubpage<T>[] smallSubpagePools;
 
-    private final PoolChunkList<T> q050;
-    private final PoolChunkList<T> q025;
-    private final PoolChunkList<T> q000;
-    private final PoolChunkList<T> qInit;
-    private final PoolChunkList<T> q075;
-    private final PoolChunkList<T> q100;
+    // 六个 PoolChunkList 分别存储不同利用率的 Chunk，除了 qInit,它们之间都形成了双向链表,用于分配大于 8K 的内存
+    private final PoolChunkList<T> qInit;//内存使用率为 0 ~ 25% 的 Chunk
+    private final PoolChunkList<T> q000;//内存使用率为 1 ~ 50% 的 Chunk
+    private final PoolChunkList<T> q025;//内存使用率为 25% ~ 75% 的 Chunk
+    private final PoolChunkList<T> q050;//内存使用率为 50% ~ 100% 的 Chunk
+    private final PoolChunkList<T> q075;//内存使用率为 75% ~ 100% 的 Chunk
+    private final PoolChunkList<T> q100;//内存使用率为 100% 的 Chunk
 
     private final List<PoolChunkListMetric> chunkListMetrics;
 

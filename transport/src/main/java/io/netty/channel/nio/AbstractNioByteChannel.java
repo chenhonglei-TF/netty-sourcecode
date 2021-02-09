@@ -256,9 +256,18 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
         return WRITE_STATUS_SNDBUF_FULL;
     }
 
+    /*
+        负责将数据真正写入到 Socket 缓冲区
+     */
     @Override
     protected void doWrite(ChannelOutboundBuffer in) throws Exception {
+        //根据配置获取自旋锁的次数 writeSpinCount
+        //这个自旋锁的次数主要是用来干什么的呢？
+        // 当我们向 Socket 底层写数据的时候，如果每次要写入的数据量很大，是不可能一次将数据写完的，所以只能分批写入。
+        // Netty 在不断调用执行写入逻辑的时候，EventLoop 线程可能一直在等待，这样有可能会阻塞其他事件处理。
+        // 所以这里自旋锁的次数相当于控制一次写入数据的最大的循环执行次数，如果超过所设置的自旋锁次数，那么写操作将会被暂时中断
         int writeSpinCount = config().getWriteSpinCount();
+
         do {
             Object msg = in.current();
             if (msg == null) {
@@ -267,9 +276,12 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                 // Directly return here so incompleteWrite(...) is not called.
                 return;
             }
+            //删除缓存中的链表节点以及调用底层 API 发送数据
             writeSpinCount -= doWriteInternal(in, msg);
         } while (writeSpinCount > 0);
 
+        //确保数据能够全部发送出去，因为自旋锁次数的限制，可能数据并没有写完，所以需要继续 OP_WRITE 事件；
+        // 如果数据已经写完，清除 OP_WRITE 事件即可
         incompleteWrite(writeSpinCount < 0);
     }
 
