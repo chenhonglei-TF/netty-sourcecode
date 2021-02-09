@@ -46,6 +46,9 @@ import java.util.concurrent.TimeUnit;
  * <li><tt>getTrafficCounter</tt> allows you to have access to the TrafficCounter and so to stop
  * or start the monitoring, to change the checkInterval directly, or to have access to its values.</li>
  * </ul>
+ *
+ * 流量整形（Traffic Shaping）是一种主动控制服务流量输出速率的措施，保证下游服务能够平稳处理。
+ * 流量整形和流控的区别在于，流量整形不会丢弃和拒绝消息，无论流量洪峰有多大，它都会采用令牌桶算法控制流量以恒定的速率输出
  */
 public abstract class AbstractTrafficShapingHandler extends ChannelDuplexHandler {
     private static final InternalLogger logger =
