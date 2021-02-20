@@ -42,6 +42,7 @@ public class SocketIOProperties {
         ServerSocket server = null;
         try {
             server = new ServerSocket();
+            // bind的时候，系统会开辟一个SOCKET资源，处于监听状态，单尚未分配给程序使用
             server.bind(new InetSocketAddress(9090), BACK_LOG);
             server.setReceiveBufferSize(RECEIVE_BUFFER);
             server.setReuseAddress(REUSE_ADDR);
@@ -53,7 +54,7 @@ public class SocketIOProperties {
                 while (true) {
 
                     System.in.read();  //分水岭：
-
+                    // accept将分配的资源与程序绑定
                     Socket client = server.accept();  //阻塞的，没有 -1  一直卡着不动  accept(4,
                     System.out.println("client port: " + client.getPort());
 

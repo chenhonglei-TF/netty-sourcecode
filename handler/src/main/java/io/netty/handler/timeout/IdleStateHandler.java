@@ -109,8 +109,11 @@ public class IdleStateHandler extends ChannelDuplexHandler {
     };
 
     private final boolean observeOutput;
+    //读超时. 即当在指定的时间间隔内没有从 Channel 读取到数据时, 会触发一个 READER_IDLE 的 IdleStateEvent 事件
     private final long readerIdleTimeNanos;
+    //写超时. 即当在指定的时间间隔内没有数据写入到 Channel 时, 会触发一个 WRITER_IDLE 的 IdleStateEvent 事件.
     private final long writerIdleTimeNanos;
+    //读/写超时. 即当在指定的时间间隔内没有读或写操作时, 会触发一个 ALL_IDLE 的 IdleStateEvent 事件.
     private final long allIdleTimeNanos;
 
     private ScheduledFuture<?> readerIdleTimeout;

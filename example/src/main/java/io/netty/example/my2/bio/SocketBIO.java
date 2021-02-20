@@ -15,7 +15,7 @@ public class SocketBIO {
 
         while (true) {
             Socket client = server.accept();  //阻塞1
-            System.out.println("step2:client\t" + client.getPort());
+            System.out.println("step2:clientIP：" + client.getInetAddress().getHostAddress() +"clientPort："+ client.getPort());
 
             new Thread(new Runnable(){
 
